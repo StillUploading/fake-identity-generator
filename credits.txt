@@ -1,0 +1,2 @@
+Familly name by: https://github.com/FinNLP/humannames
+Female/male first name by: https://github.com/AlessandroMinoccheri/human-names/tree/master/data

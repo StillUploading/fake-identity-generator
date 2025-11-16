@@ -1,40 +1,43 @@
-import time, os, json, random
+import json
+import random
+
+# Paths
+FEMALE_EN = "data/female-human-names-en.json"
+MALE_EN = "data/male-human-names-en.json"
+FAMILY_NAME = "data/familly_name.json"
 
 
-female_en = "data/female-human-names-en.json"
-male_en = "data/male-human-names-en.json"
-familly_name = "data/familly_name.json"
-female = "error"
-male = "error"
-familly = "error"
-# Variables (for generator)
-age = 0
-gender = 0
-gender_string = "error"
-first_name = "error"
-last_name = "error"
+def load_json(path):
+    """Load a JSON file safely."""
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"Error loading {path}: {e}")
+        return None
+
 
 def loading():
-    global female, male, familly
     print("Loading...")
-    with open(female_en) as f:
-        female = json.load(f)
-    with open(male_en) as f:
-        male = json.load(f)
-    with open(familly_name) as f:
-        familly = json.load(f)
-    print("Loaded with succes !")
+
+    female = load_json(FEMALE_EN)
+    male = load_json(MALE_EN)
+    familly = load_json(FAMILY_NAME)
+
+    if not female or not male or not familly:
+        print("❌ Failed to load data. Exiting.")
+        exit()
+
+    print("Loaded successfully!")
+    return female, male, familly
 
 
-
-def generator():
-    global first_name, last_name, age, gender_string
-
+def generator(female, male, familly):
+    """Generate an identity."""
     print("Informations required")
 
     gender = input("Enter the gender (1 = male, 2 = female): ")
 
-    # Determine which list to use
     if gender == "1":
         gender_string = "male"
         first_name = random.choice(male)
@@ -45,40 +48,49 @@ def generator():
         print("Invalid gender.")
         return
 
-    print("What age group?")
-    age_1 = int(input("Between: "))
-    age_2 = int(input("and: "))
+    # Age range
+    try:
+        age_1 = int(input("Between: "))
+        age_2 = int(input("and: "))
+        if age_1 > age_2:
+            age_1, age_2 = age_2, age_1
+    except ValueError:
+        print("Invalid number.")
+        return
 
     age = random.randint(age_1, age_2)
     last_name = random.choice(familly)
 
+    # Output
     print("\nGenerated Identity:")
     print("------------------------")
-    print("Gender:", gender_string)
-    print("First name:", first_name)
-    print("Last name:", last_name)
-    print("Age:", age)
+    print(f"Gender: {gender_string}")
+    print(f"First name: {first_name}")
+    print(f"Last name: {last_name}")
+    print(f"Age: {age}")
     print("------------------------")
-
-
-
 
 
 def main():
+
     print("""
 ▗▘▐▘  ▌   ▝▖  ▄▖ ▌    ▗ ▘▗     ▄▖          ▗     
 ▐ ▜▘▀▌▙▘█▌ ▌  ▐ ▛▌█▌▛▌▜▘▌▜▘▌▌  ▌ █▌▛▌█▌▛▘▀▌▜▘▛▌▛▘
 ▐ ▐ █▌▛▖▙▖ ▌  ▟▖▙▌▙▖▌▌▐▖▌▐▖▙▌  ▙▌▙▖▌▌▙▖▌ █▌▐▖▙▌▌ 
-▝▖        ▗▘               ▄▌                                                                                            
+▝▖        ▗▘               ▄▌
     """)
 
-    loading()
-    print("Made by https://github.com/StillUploading, FOR LEGAL/EDUCATIONAL USE ONLY. I am not responsible for any excesses.")
-    agree = str(input("I agree to use this tool legally (yes/no): "))
+    female, male, familly = loading()
+
+    print("Made by https://github.com/StillUploading, FOR LEGAL/EDUCATIONAL USE ONLY.")
+    agree = input("I agree to use this tool legally (yes/no): ").lower()
+
     if agree != "yes":
-        print("I'm sorry, but you cannot proceed :(")
-    generator()
-    
+        print("You cannot proceed.")
+        return
+
+    generator(female, male, familly)
+
 
 if __name__ == "__main__":
     main()
